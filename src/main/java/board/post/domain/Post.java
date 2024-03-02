@@ -3,6 +3,7 @@ package board.post.domain;
 import board.common.BaseTimeEntity;
 import board.member.domain.Member;
 import board.post.presentation.request.PostCreateRequest;
+import board.post.presentation.request.PostUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +28,7 @@ public class Post extends BaseTimeEntity {
 
     private String content;
 
+    @Column(nullable = false)
     private Boolean delete;
 
     public Post(final Member member, final PostCreateRequest postCreateRequest) {
@@ -36,18 +38,40 @@ public class Post extends BaseTimeEntity {
         this.delete = false;
     }
 
-    public void validateAndDelete(final Long memberId) {
+    public void delete(final Long memberId) {
+        validate(memberId);
+        this.delete = true;
+    }
+
+    public void update(final Long memberId, final PostUpdateRequest postUpdateRequest) {
+        validate(memberId);
+        this.title = postUpdateRequest.getTitle();
+        this.content = postUpdateRequest.getContent();
+    }
+
+    private void validate(final Long memberId) {
         if (this.member.getId() != memberId) {
             throw new RuntimeException("작성자가 아닙니다.");
         }
         if(this.delete) {
             throw new RuntimeException("존재하지 않는 글입니다.");
         }
-        this.delete = true;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Boolean getDelete() {
+        return delete;
     }
 
     protected Post() {

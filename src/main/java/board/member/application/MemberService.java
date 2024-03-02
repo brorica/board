@@ -19,6 +19,7 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
+    @Transactional(readOnly = false)
     public void createMember(final MemberSignUpRequest memberSignUpRequest) {
         checkDuplicatedEmail(memberSignUpRequest.getEmail());
         memberRepository.save(memberSignUpRequest.toEntity());
@@ -31,20 +32,22 @@ public class MemberService {
         }
     }
 
+    @Transactional(readOnly = false)
     public LoginMemberInfo authenticate(final MemberSignInRequest memberSignInRequest) {
-        return checkValidEmailAndPassword(memberSignInRequest);
+        Member member = findMember(memberSignInRequest.getEmail(), memberSignInRequest.getPassword());
+        member.updateCurrentTimeModifiedAt();
+        return new LoginMemberInfo(member);
     }
 
-    private LoginMemberInfo checkValidEmailAndPassword(final MemberSignInRequest memberSignInRequest) {
-        final List<LoginMemberInfo> byEmailAndPassword = memberRepository.findByEmailAndPassword(memberSignInRequest.getEmail(),
-                                                                                                 memberSignInRequest.getPassword());
-        if (byEmailAndPassword.isEmpty()) {
+    public Member findMember(final String email, final String password) {
+        final List<Member> matchedMember = memberRepository.findAllByEmailAndPassword(email, password);
+        if (matchedMember.isEmpty()) {
             throw new RuntimeException("아이디 또는 패스워드가 틀렸습니다.");
         }
-        return byEmailAndPassword.get(0);
+        return matchedMember.get(0);
     }
 
-    public Member getMemberById(final Long id) {
+    public Member findMember(final Long id) {
         return memberRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
     }

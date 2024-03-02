@@ -1,14 +1,16 @@
 package board.member.presentation.dto;
 
+import board.member.domain.Member;
+
 public class LoginMemberInfo {
 
     private final Long id;
 
     private final String email;
 
-    public LoginMemberInfo(final Long id, final String email) {
-        this.id = id;
-        this.email = email;
+    public LoginMemberInfo(final Member member) {
+        this.id = member.getId();
+        this.email = member.getEmail();
     }
 
     public Long getId() {
