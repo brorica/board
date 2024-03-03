@@ -4,18 +4,18 @@ import board.post.domain.Post;
 
 public class PostDetailResponse {
 
-    private Long id;
+    private Long postId;
     private String title;
     private String content;
 
     public PostDetailResponse(final Post post) {
-        this.id = post.getId();
+        this.postId = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
     }
 
-    public Long getId() {
-        return id;
+    public Long getPostId() {
+        return postId;
     }
 
     public String getTitle() {
