@@ -1,14 +1,17 @@
 package board.post.presentation;
 
+import board.common.PageableRequest;
+import board.common.PageableResponse;
 import board.member.presentation.dto.LoginMemberInfo;
 import board.post.application.PostService;
 import board.post.presentation.request.PostCreateRequest;
 import board.post.presentation.request.PostUpdateRequest;
 import board.post.presentation.response.PostDetailResponse;
-import board.post.presentation.response.PostList;
+import board.post.presentation.response.PostListEntry;
 import java.net.URI;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +38,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<Void> createPost(@SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
                                            @RequestBody final PostCreateRequest postCreateRequest) {
+        System.out.println(loginMemberInfo.getId());
         final Long postId = postService.createPost(loginMemberInfo.getId(), postCreateRequest);
         final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                                                    .buildAndExpand(postId).toUri();
@@ -62,16 +66,10 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<PostList> getPostList(@RequestParam(value = "lastId", required  = false) Long lastId) {
-        lastId = validateAndReplacePostId(lastId);
-        final PostList postList = postService.readPostList(lastId);
-        return ResponseEntity.ok(postList);
+    public PageableResponse getPostList(@RequestParam(value = "page", defaultValue = "0") int page,
+                                        @RequestParam(value = "size", defaultValue = "0") int size) {
+        final Pageable pageable = PageableRequest.createPageRequest(page, size, Sort.Direction.DESC, "id");
+        return postService.readPostList(pageable);
     }
 
-    private Long  validateAndReplacePostId(final Long lastId) {
-        if (lastId == null || lastId <= 0) {
-            return Long.MAX_VALUE;
-        }
-        return lastId;
-    }
 }

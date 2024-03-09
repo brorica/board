@@ -1,5 +1,6 @@
 package board.post.application;
 
+import board.common.PageableResponse;
 import board.member.application.MemberService;
 import board.member.domain.Member;
 import board.post.domain.Post;
@@ -7,10 +8,11 @@ import board.post.persistence.PostRepository;
 import board.post.presentation.request.PostCreateRequest;
 import board.post.presentation.request.PostUpdateRequest;
 import board.post.presentation.response.PostDetailResponse;
-import board.post.presentation.response.PostList;
 import board.post.presentation.response.PostListEntry;
 import java.util.List;
-import org.springframework.data.domain.PageRequest;
+import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +49,8 @@ public class PostService {
     }
 
     @Transactional(readOnly = false)
-    public void updatePost(final Long memberId, final Long postId, final PostUpdateRequest postUpdateRequest) {
+    public void updatePost(final Long memberId, final Long postId,
+        final PostUpdateRequest postUpdateRequest) {
         final Post post = findPost(postId);
         post.update(memberId, postUpdateRequest);
     }
@@ -57,9 +60,14 @@ public class PostService {
         return new PostDetailResponse(post);
     }
 
-    public PostList readPostList(Long lastPostId) {
-        final PageRequest pageRequest  = PageRequest.of(0, PAGE_SIZE);
-        final List<PostListEntry> postsPage10 = postRepository.findPostsPage10(lastPostId, pageRequest);
-        return new PostList(postsPage10);
+    public PageableResponse readPostList(final Pageable pageable) {
+        final Page<Post> postsPage = postRepository.findByDeleteFalseOrderByIdDesc(pageable);
+        final List<PostListEntry> postListEntries = postsPage.getContent().stream()
+                                                             .map(post -> new PostListEntry(post.getId(), post.getTitle()))
+                                                             .collect(Collectors.toList());
+        return new PageableResponse<>(postListEntries,
+                                      postsPage.getNumber(),
+                                      postsPage.isFirst(),
+                                      postsPage.isLast());
     }
 }
