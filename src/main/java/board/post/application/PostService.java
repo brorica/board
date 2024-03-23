@@ -61,10 +61,11 @@ public class PostService {
 
     public PageableResponse readPostList(final Pageable pageable) {
         final Page<Post> postsPage = postRepository.findByDeleteFalseOrderByIdDesc(pageable);
-        final List<PostListEntry> postListEntries = postsPage.getContent().stream()
+        final List<PostListEntry> postListEntries = postsPage.getContent()
+                                                             .stream()
                                                              .map(post -> new PostListEntry(post.getId(), post.getTitle()))
                                                              .collect(Collectors.toList());
-        final List<Integer> pageNumbers = getPageNumbers(pageable.getPageNumber(), postListEntries);
+        final List<Integer> pageNumbers = getPageNumbers(pageable, postsPage.getTotalPages());
         return new PageableResponse<>(postListEntries,
                                       postsPage.getNumber(),
                                       postsPage.isFirst(),
@@ -72,34 +73,19 @@ public class PostService {
                                       pageNumbers);
     }
 
-    private List<Integer> getPageNumbers(int page, List<PostListEntry> postListEntries) {
+    private List<Integer> getPageNumbers(Pageable pageable, int totalPages) {
+        int currentPage = pageable.getPageNumber();
         List<Integer> pageNumbers = new ArrayList<>();
-        // 존재하지 않는 페이지로 이동시 빈 값 반환
-        if(postListEntries.isEmpty()) {
-            return pageNumbers;
+
+        int startPage = Math.max(currentPage - 4, 0);
+        int endPage = Math.min(startPage + 10, totalPages);
+
+        // 시작 페이지를 조정하여 항상 페이지 목록이 10개가 되도록 함
+        if (endPage - startPage < 10) {
+            startPage = Math.max(endPage - 10, 0);
         }
-        final long pageFirstPostId = postListEntries.get(0).getPostId();
-        final int total = postRepository.countByDeleteFalseAndIdLessThanEqual(pageFirstPostId);
-        // 페이지당 10개의 게시글을 보여주므로 몇 개의 페이지가 나오는지 계산
-        int totalPageNumber = total / 10;
-        // 마지막 페이지에서 10개 미만인 경우 하나의 페이지로 간주
-        if(total % 10 > 0) {
-            totalPageNumber += 1;
-        }
-        // 페이지 리스트를 10개 까지 보여줘야 함
-        if(totalPageNumber < 10) {
-            int prevPageNumberStart = 10 - totalPageNumber;
-            for (int i = prevPageNumberStart; i > 0; i--) {
-                pageNumbers.add(page - i);
-            }
-            for (int i = 0; i < totalPageNumber; i++) {
-                pageNumbers.add(page + i);
-            }
-        }
-        else {
-            for (int i = 0; i < 10; i++) {
-                pageNumbers.add(page + i);
-            }
+        for (int i = startPage; i < endPage; i++) {
+            pageNumbers.add(i);
         }
         return pageNumbers;
     }
