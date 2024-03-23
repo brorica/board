@@ -13,4 +13,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndDeleteIsFalse(final Long id);
 
     Page<Post> findByDeleteFalseOrderByIdDesc(Pageable pageable);
+
+    Integer countByDeleteFalseAndIdLessThanEqual(Long pageFirstPostId);
 }

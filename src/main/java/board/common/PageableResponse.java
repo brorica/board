@@ -9,12 +9,14 @@ public class PageableResponse<T> {
     private final int currentPage;
     private final boolean first;
     private final boolean last;
+    private final List<Integer> pageNumbers;
 
-    public PageableResponse(final List<T> content, int currentPage, boolean first, boolean last) {
+    public PageableResponse(final List<T> content, int currentPage, boolean first, boolean last, List<Integer> pageNumbers) {
         this.content = Collections.unmodifiableList(content);
         this.currentPage = currentPage;
         this.first = first;
         this.last = last;
+        this.pageNumbers = Collections.unmodifiableList(pageNumbers);
     }
 
     public List<T> getContent() {
@@ -31,5 +33,9 @@ public class PageableResponse<T> {
 
     public boolean isLast() {
         return last;
+    }
+
+    public List<Integer> getPageNumbers() {
+        return pageNumbers;
     }
 }
