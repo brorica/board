@@ -19,7 +19,7 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public void createMember(final MemberSignUpRequest memberSignUpRequest) {
         checkDuplicatedEmail(memberSignUpRequest.getEmail());
         memberRepository.save(memberSignUpRequest.toEntity());
@@ -32,7 +32,7 @@ public class MemberService {
         }
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public LoginMemberInfo authenticate(final MemberSignInRequest memberSignInRequest) {
         Member member = findMember(memberSignInRequest.getEmail(), memberSignInRequest.getPassword());
         member.updateCurrentTimeModifiedAt();

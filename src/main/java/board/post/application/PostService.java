@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
@@ -30,7 +31,7 @@ public class PostService {
         this.memberService = memberService;
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public Long createPost(final Long memberId, final PostCreateRequest postCreateRequest) {
         final Member member = memberService.findMember(memberId);
         return postRepository.save(new Post(member, postCreateRequest)).getId();
@@ -41,21 +42,26 @@ public class PostService {
             .orElseThrow(() -> new RuntimeException("존재하지 않는 글입니다."));
     }
 
-    @Transactional(readOnly = false)
+    @Transactional
     public void deletePost(final Long memberId, final Long postId) {
         final Post post = findPost(postId);
         post.delete(memberId);
     }
 
-    @Transactional(readOnly = false)
-    public void updatePost(final Long memberId, final Long postId,
-        final PostUpdateRequest postUpdateRequest) {
+    @Transactional
+    public void updatePost(final Long memberId, final Long postId, final PostUpdateRequest postUpdateRequest) {
         final Post post = findPost(postId);
         post.update(memberId, postUpdateRequest);
     }
 
-    public PostDetailResponse readPostDetail(final Long postId) {
+    /**
+     * 이 메소드는 게시글 상세정보를 반환하면서 조회수를 올리는 2가지 역할을 함
+     * 이걸 분리할지 말지에 대해 찾아봐야 함
+     */
+    @Transactional
+    public PostDetailResponse readPostDetailAndIncreaseViewCount(final Long postId) {
         final Post post = findPost(postId);
+        post.increaseViewCount();
         return new PostDetailResponse(post);
     }
 
@@ -63,7 +69,13 @@ public class PostService {
         final Page<Post> postsPage = postRepository.findByDeleteFalseOrderByIdDesc(pageable);
         final List<PostListEntry> postListEntries = postsPage.getContent()
                                                              .stream()
-                                                             .map(post -> new PostListEntry(post.getId(), post.getTitle()))
+                                                             .map(post -> new PostListEntry(post.getId(),
+                                                                                            post.getTitle(),
+                                                                                            post.getCreator(),
+                                                                                            post.getCreatedAt(),
+                                                                                            post.getViewCount(),
+                                                                                            post.getUpvoteCount())
+                                                             )
                                                              .collect(Collectors.toList());
         final List<Integer> pageNumbers = getPageNumbers(pageable, postsPage.getTotalPages());
         return new PageableResponse<>(postListEntries,
@@ -88,5 +100,11 @@ public class PostService {
             pageNumbers.add(i);
         }
         return pageNumbers;
+    }
+
+    @Transactional
+    public void increaseOrDecreasePostUpvote(final Long postId) {
+        // todo: 추천 관련 erd 그리고 구현하기
+        final Post post = findPost(postId);
     }
 }

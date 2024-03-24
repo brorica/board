@@ -31,11 +31,19 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean delete;
 
+    @Column(nullable = false)
+    private Long viewCount;
+
+    @Column(nullable = false)
+    private Long upvoteCount;
+
     public Post(final Member member, final PostCreateRequest postCreateRequest) {
         this.member = member;
         this.title = postCreateRequest.getTitle();
         this.content = postCreateRequest.getContent();
         this.delete = false;
+        this.viewCount = 0L;
+        this.upvoteCount = 0L;
     }
 
     public void delete(final Long memberId) {
@@ -58,8 +66,16 @@ public class Post extends BaseTimeEntity {
         }
     }
 
+    public void increaseViewCount() {
+        this.viewCount += 1;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public String getCreator() {
+        return member.getEmail();
     }
 
     public String getTitle() {
@@ -72,6 +88,14 @@ public class Post extends BaseTimeEntity {
 
     public Boolean getDelete() {
         return delete;
+    }
+
+    public Long getViewCount() {
+        return viewCount;
+    }
+
+    public Long getUpvoteCount() {
+        return upvoteCount;
     }
 
     protected Post() {

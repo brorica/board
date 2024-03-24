@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -62,7 +63,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PostDetailResponse> getPostDetail(@PathVariable("id") final Long postId) {
-        return ResponseEntity.ok(postService.readPostDetail(postId));
+        return ResponseEntity.ok(postService.readPostDetailAndIncreaseViewCount(postId));
     }
 
     @GetMapping
@@ -72,4 +73,8 @@ public class PostController {
         return postService.readPostList(pageable);
     }
 
+    @PatchMapping("/upvote/{id}")
+    public ResponseEntity<Void> toggleUpvote(@PathVariable("id") final Long postId) {
+        return ResponseEntity.ok().build();
+    }
 }

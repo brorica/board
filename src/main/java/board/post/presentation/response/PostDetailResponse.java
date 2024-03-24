@@ -1,16 +1,31 @@
 package board.post.presentation.response;
 
 import board.post.domain.Post;
+import java.time.LocalDateTime;
 
 public class PostDetailResponse {
 
-    private Long postId;
-    private String title;
-    private String content;
+    private final Long postId;
+
+    private final String title;
+
+    private final String creator;
+
+    private final LocalDateTime createdAt;
+
+    private final Long viewCount;
+
+    private final Long upvoteCount;
+
+    private final String content;
 
     public PostDetailResponse(final Post post) {
         this.postId = post.getId();
         this.title = post.getTitle();
+        this.creator = post.getCreator();
+        this.createdAt = post.getCreatedAt();
+        this.viewCount = post.getViewCount();
+        this.upvoteCount = post.getUpvoteCount();
         this.content = post.getContent();
     }
 
@@ -20,6 +35,22 @@ public class PostDetailResponse {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getViewCount() {
+        return viewCount;
+    }
+
+    public Long getUpvoteCount() {
+        return upvoteCount;
     }
 
     public String getContent() {
