@@ -4,9 +4,11 @@ import board.member.application.MemberService;
 import board.member.presentation.dto.LoginMemberInfo;
 import board.member.presentation.dto.request.MemberSignInRequest;
 import board.member.presentation.dto.request.MemberSignUpRequest;
+import board.member.presentation.dto.response.SignInResponse;
 import jakarta.servlet.http.HttpSession;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,21 +21,40 @@ public class MemberPresentation {
 
     private final MemberService memberService;
 
+    private final String clientRoute = "http://localhost:3000";
+
     public MemberPresentation(final MemberService memberService) {
         this.memberService = memberService;
     }
 
+    /**
+     * 회원 가입
+     */
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUpMember(@RequestBody final MemberSignUpRequest memberSignUpRequest) {
+    public ResponseEntity<Void> signUpMember(
+        @RequestBody final MemberSignUpRequest memberSignUpRequest) {
         memberService.createMember(memberSignUpRequest);
         final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
         return ResponseEntity.created(uri).build();
     }
 
+    /**
+     * 로그인
+     */
     @PostMapping("/sign-in")
-    public ResponseEntity<Void> signInMember(@RequestBody final MemberSignInRequest memberSignInRequest, HttpSession session) {
+    public ResponseEntity<SignInResponse> signInMember(
+        @RequestBody final MemberSignInRequest memberSignInRequest, HttpSession session) {
         final LoginMemberInfo loginMemberInfo = memberService.authenticate(memberSignInRequest);
         session.setAttribute("loginMemberInfo", loginMemberInfo);
+        return ResponseEntity.ok(new SignInResponse(loginMemberInfo.getEmail()));
+    }
+
+    /**
+     * 로그아웃
+     */
+    @GetMapping("/sign-out")
+    public ResponseEntity<Void> signOutMember(HttpSession session) {
+        session.invalidate();
         return ResponseEntity.ok().build();
     }
 }
