@@ -66,6 +66,13 @@ public class Post extends BaseTimeEntity {
         }
     }
 
+    public Boolean isAuth(final Long memberId) {
+        if (this.member.getId() == memberId) {
+            return true;
+        }
+        return false;
+    }
+
     public void increaseViewCount() {
         this.viewCount += 1;
     }

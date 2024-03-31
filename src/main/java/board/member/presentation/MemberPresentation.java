@@ -1,6 +1,7 @@
 package board.member.presentation;
 
 import board.member.application.MemberService;
+import board.member.domain.Member;
 import board.member.presentation.dto.LoginMemberInfo;
 import board.member.presentation.dto.request.MemberSignInRequest;
 import board.member.presentation.dto.request.MemberSignUpRequest;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -31,11 +33,23 @@ public class MemberPresentation {
      * 회원 가입
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUpMember(
-        @RequestBody final MemberSignUpRequest memberSignUpRequest) {
+    public ResponseEntity<Void> signUpMember(@RequestBody final MemberSignUpRequest memberSignUpRequest) {
         memberService.createMember(memberSignUpRequest);
         final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
         return ResponseEntity.created(uri).build();
+    }
+
+    /**
+     * 중복 체크
+     */
+    @GetMapping("/sign-up")
+    public ResponseEntity<Void> checkDuplicateEmail(@RequestParam(value = "email") final String email) {
+        final Boolean isDuplicated = memberService.checkDuplicated(email);
+        if(isDuplicated) {
+            return ResponseEntity.status(409).build();
+        } else {
+            return ResponseEntity.ok().build();
+        }
     }
 
     /**

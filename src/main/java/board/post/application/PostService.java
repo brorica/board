@@ -107,4 +107,9 @@ public class PostService {
         // todo: 추천 관련 erd 그리고 구현하기
         final Post post = findPost(postId);
     }
+
+    public Boolean isPostAuthor(final Long memberId, final Long postId) {
+        final Post post = findPost(postId);
+        return post.isAuth(memberId);
+    }
 }

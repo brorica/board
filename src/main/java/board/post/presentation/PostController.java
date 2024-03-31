@@ -8,6 +8,7 @@ import board.post.presentation.request.PostCreateRequest;
 import board.post.presentation.request.PostUpdateRequest;
 import board.post.presentation.response.PostDetailResponse;
 import java.net.URI;
+import org.apache.coyote.Response;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -77,5 +78,16 @@ public class PostController {
     @PatchMapping("/upvote/{id}")
     public ResponseEntity<Void> toggleUpvote(@PathVariable("id") final Long postId) {
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/auth")
+    public ResponseEntity<Void> checkPostAuth(@SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
+                                              @PathVariable("id") final Long postId) {
+        Boolean isAuthor = postService.isPostAuthor(loginMemberInfo.getId(), postId);
+        if(isAuthor) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

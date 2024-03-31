@@ -6,6 +6,7 @@ import board.member.presentation.dto.LoginMemberInfo;
 import board.member.presentation.dto.request.MemberSignInRequest;
 import board.member.presentation.dto.request.MemberSignUpRequest;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,10 @@ public class MemberService {
     public Member findMember(final Long id) {
         return memberRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+    }
+
+    public Boolean checkDuplicated(final String email) {
+        return memberRepository.findByEmail(email).isPresent();
     }
 }
 
