@@ -1,5 +1,6 @@
 package board.member.domain;
 
+import board.post.domain.Comment;
 import board.common.BaseTimeEntity;
 import board.post.domain.Post;
 import jakarta.persistence.Column;
@@ -20,7 +21,10 @@ public class Member extends BaseTimeEntity {
     private Long id;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<Post> posts = new ArrayList<>();
+    private List<Post> postList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Comment> commentList = new ArrayList<>();
 
     @Column(nullable = false)
     private String email;

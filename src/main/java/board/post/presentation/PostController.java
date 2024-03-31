@@ -7,9 +7,7 @@ import board.post.application.PostService;
 import board.post.presentation.request.PostCreateRequest;
 import board.post.presentation.request.PostUpdateRequest;
 import board.post.presentation.response.PostDetailResponse;
-import board.post.presentation.response.PostListEntry;
 import java.net.URI;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -37,26 +35,28 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createPost(@SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
-                                           @RequestBody final PostCreateRequest postCreateRequest) {
-        System.out.println(loginMemberInfo.getId());
+    public ResponseEntity<Void> createPost(
+        @SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
+        @RequestBody final PostCreateRequest postCreateRequest) {
         final Long postId = postService.createPost(loginMemberInfo.getId(), postCreateRequest);
         final URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                                                   .buildAndExpand(postId).toUri();
+            .buildAndExpand(postId).toUri();
         return ResponseEntity.created(uri).build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
-                                           @PathVariable("id") final Long postId) {
+    public ResponseEntity<Void> deletePost(
+        @SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
+        @PathVariable("id") final Long postId) {
         postService.deletePost(loginMemberInfo.getId(), postId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePost(@SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
-                                           @PathVariable("id") final Long postId,
-                                           @RequestBody final PostUpdateRequest postUpdateRequest) {
+    public ResponseEntity<Void> updatePost(
+        @SessionAttribute("loginMemberInfo") final LoginMemberInfo loginMemberInfo,
+        @PathVariable("id") final Long postId,
+        @RequestBody final PostUpdateRequest postUpdateRequest) {
         postService.updatePost(loginMemberInfo.getId(), postId, postUpdateRequest);
         return ResponseEntity.ok().build();
     }
@@ -68,8 +68,9 @@ public class PostController {
 
     @GetMapping
     public PageableResponse getPostList(@RequestParam(value = "page", defaultValue = "0") int page,
-                                        @RequestParam(value = "size", defaultValue = "0") int size) {
-        final Pageable pageable = PageableRequest.createPageRequest(page, size, Sort.Direction.DESC, "id");
+        @RequestParam(value = "size", defaultValue = "0") int size) {
+        final Pageable pageable = PageableRequest.createPageRequest(page, size, Sort.Direction.DESC,
+            "id");
         return postService.readPostList(pageable);
     }
 
