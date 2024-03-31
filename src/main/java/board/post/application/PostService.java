@@ -44,13 +44,13 @@ public class PostService {
 
     @Transactional
     public void deletePost(final Long memberId, final Long postId) {
-        final Post post = findPost(postId);
+        Post post = findPost(postId);
         post.delete(memberId);
     }
 
     @Transactional
     public void updatePost(final Long memberId, final Long postId, final PostUpdateRequest postUpdateRequest) {
-        final Post post = findPost(postId);
+        Post post = findPost(postId);
         post.update(memberId, postUpdateRequest);
     }
 
@@ -60,7 +60,7 @@ public class PostService {
      */
     @Transactional
     public PostDetailResponse readPostDetailAndIncreaseViewCount(final Long postId) {
-        final Post post = findPost(postId);
+        Post post = findPost(postId);
         post.increaseViewCount();
         return new PostDetailResponse(post);
     }
