@@ -2,8 +2,8 @@ package board.post.exception;
 
 import board.common.exception.ForbiddenException;
 
-public class CommentNotOwnerException extends ForbiddenException {
-    public CommentNotOwnerException(String message) {
+public class CommentNotOwner extends ForbiddenException {
+    public CommentNotOwner(String message) {
         super(message);
     }
 }

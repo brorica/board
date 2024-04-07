@@ -1,9 +1,9 @@
 package board.member.exception;
 
-import board.common.exception.NotFound;
+import board.common.exception.NotFoundException;
 
-public class MemberNotFoundException extends NotFound {
-    public MemberNotFoundException(String message) {
+public class MemberNotFoundExceptionException extends NotFoundException {
+    public MemberNotFoundExceptionException(String message) {
         super(message);
     }
 }

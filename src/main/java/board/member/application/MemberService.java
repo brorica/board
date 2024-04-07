@@ -1,14 +1,22 @@
 package board.member.application;
 
 import board.member.domain.Member;
+import board.member.exception.DuplicatedEmailException;
+import board.member.exception.LoginFailException;
+import board.member.exception.MemberNotFoundExceptionException;
 import board.member.persistence.MemberRepository;
 import board.member.presentation.dto.LoginMemberInfo;
 import board.member.presentation.dto.request.MemberSignInRequest;
 import board.member.presentation.dto.request.MemberSignUpRequest;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static board.common.exception.ConflictException.MEMBER_SIGNUP_DUPLICATED_EMAIL;
+import static board.common.exception.NotFoundException.MEMBER_NOT_FOUND;
+import static board.common.exception.UnauthorizedException.MEMBER_SIGN_IN_UNAUTHORIZED;
 
 @Transactional(readOnly = true)
 @Service
@@ -29,7 +37,7 @@ public class MemberService {
     public void checkDuplicatedEmail(final String email) {
         final List<Long> memberIdByEmail = memberRepository.findIdByEmail(email);
         if (!memberIdByEmail.isEmpty()) {
-            throw new RuntimeException("중복된 이메일");
+            throw new DuplicatedEmailException(MEMBER_SIGNUP_DUPLICATED_EMAIL);
         }
     }
 
@@ -43,18 +51,21 @@ public class MemberService {
     public Member findMember(final String email, final String password) {
         final List<Member> matchedMember = memberRepository.findAllByEmailAndPassword(email, password);
         if (matchedMember.isEmpty()) {
-            throw new RuntimeException("아이디 또는 패스워드가 틀렸습니다.");
+            throw new LoginFailException(MEMBER_SIGN_IN_UNAUTHORIZED);
         }
         return matchedMember.get(0);
     }
 
     public Member findMember(final Long id) {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+            .orElseThrow(() -> new MemberNotFoundExceptionException(MEMBER_NOT_FOUND));
     }
 
-    public Boolean checkDuplicated(final String email) {
-        return memberRepository.findByEmail(email).isPresent();
+    public void checkEmailDuplicatedAtSigunUp(final String email) {
+        Optional<Member> optionalMemberByEmail = memberRepository.findByEmail(email);
+        if (optionalMemberByEmail.isPresent()) {
+            throw new DuplicatedEmailException(MEMBER_SIGNUP_DUPLICATED_EMAIL);
+        }
     }
 }
 

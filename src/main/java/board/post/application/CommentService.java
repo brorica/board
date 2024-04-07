@@ -4,6 +4,7 @@ import board.member.application.MemberService;
 import board.member.domain.Member;
 import board.post.domain.Comment;
 import board.post.domain.Post;
+import board.post.exception.CommentNotFoundException;
 import board.post.persistence.CommentRepository;
 import board.post.presentation.request.CommentCreateRequest;
 import board.post.presentation.request.CommentUpdateRequest;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static board.common.exception.NotFoundException.COMMENT_NOT_FOUND;
 
 @Transactional(readOnly = true)
 @Service
@@ -47,7 +50,7 @@ public class CommentService {
 
     public Comment findComment(final Long commentId) {
         return commentRepository.findById(commentId)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 댓글"));
+            .orElseThrow(() -> new CommentNotFoundException(COMMENT_NOT_FOUND));
     }
 
     @Transactional

@@ -44,12 +44,8 @@ public class MemberPresentation {
      */
     @GetMapping("/sign-up")
     public ResponseEntity<Void> checkDuplicateEmail(@RequestParam(value = "email") final String email) {
-        final Boolean isDuplicated = memberService.checkDuplicated(email);
-        if(isDuplicated) {
-            return ResponseEntity.status(409).build();
-        } else {
-            return ResponseEntity.ok().build();
-        }
+        memberService.checkEmailDuplicatedAtSigunUp(email);
+        return ResponseEntity.ok().build();
     }
 
     /**

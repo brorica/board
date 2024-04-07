@@ -1,9 +1,9 @@
 package board.post.exception;
 
-import board.common.exception.NotFound;
+import board.common.exception.NotFoundException;
 
-public class PostNotFound extends NotFound {
-    public PostNotFound(String message) {
+public class PostNotFoundException extends NotFoundException {
+    public PostNotFoundException(String message) {
         super(message);
     }
 }

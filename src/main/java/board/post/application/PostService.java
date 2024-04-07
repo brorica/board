@@ -4,6 +4,7 @@ import board.common.PageableResponse;
 import board.member.application.MemberService;
 import board.member.domain.Member;
 import board.post.domain.Post;
+import board.post.exception.PostNotFoundException;
 import board.post.persistence.PostRepository;
 import board.post.presentation.request.PostCreateRequest;
 import board.post.presentation.request.PostUpdateRequest;
@@ -15,8 +16,9 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import static board.common.exception.NotFoundException.POST_NOT_FOUND;
 
 @Transactional(readOnly = true)
 @Service
@@ -39,7 +41,7 @@ public class PostService {
 
     public Post findPost(final Long postId) {
         return postRepository.findByIdAndDeleteIsFalse(postId)
-            .orElseThrow(() -> new RuntimeException("존재하지 않는 글입니다."));
+            .orElseThrow(() -> new PostNotFoundException(POST_NOT_FOUND));
     }
 
     @Transactional

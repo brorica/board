@@ -2,6 +2,8 @@ package board.post.domain;
 
 import board.common.BaseTimeEntity;
 import board.member.domain.Member;
+import board.post.exception.CommentNotFoundException;
+import board.post.exception.CommentNotOwner;
 import board.post.presentation.request.CommentCreateRequest;
 import board.post.presentation.request.CommentUpdateRequest;
 import jakarta.persistence.Column;
@@ -11,6 +13,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
+import static board.common.exception.ForbiddenException.COMMENT_NOT_OWNER;
+import static board.common.exception.NotFoundException.COMMENT_NOT_FOUND;
 
 @Entity
 public class Comment extends BaseTimeEntity {
@@ -52,10 +57,10 @@ public class Comment extends BaseTimeEntity {
 
     private void validate(final Long memberId) {
         if (this.member.getId() != memberId) {
-            throw new RuntimeException("작성자가 아닙니다.");
+            throw new CommentNotFoundException(COMMENT_NOT_FOUND);
         }
         if (this.delete) {
-            throw new RuntimeException("존재하지 않는 글입니다.");
+            throw new CommentNotOwner(COMMENT_NOT_OWNER);
         }
     }
 
