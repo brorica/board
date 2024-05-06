@@ -67,51 +67,13 @@ public class PostService {
         return new PostDetailResponse(post);
     }
 
-    public PageableResponse readPostList(final Pageable pageable) {
-        final Page<Post> postsPage = postRepository.findByDeleteFalseOrderByIdDesc(pageable);
-        final List<PostListEntry> postListEntries = postsPage.getContent()
-                                                             .stream()
-                                                             .map(post -> new PostListEntry(post.getId(),
-                                                                                            post.getTitle(),
-                                                                                            post.getCreator(),
-                                                                                            post.getCreatedAt(),
-                                                                                            post.getViewCount(),
-                                                                                            post.getUpvoteCount())
-                                                             )
-                                                             .collect(Collectors.toList());
-        final List<Integer> pageNumbers = getPageNumbers(pageable, postsPage.getTotalPages());
-        return new PageableResponse<>(postListEntries,
-                                      postsPage.getNumber(),
-                                      postsPage.isFirst(),
-                                      postsPage.isLast(),
-                                      pageNumbers);
-    }
-
-    private List<Integer> getPageNumbers(Pageable pageable, int totalPages) {
-        int currentPage = pageable.getPageNumber();
-        List<Integer> pageNumbers = new ArrayList<>();
-
-        int startPage = Math.max(currentPage - 4, 0);
-        int endPage = Math.min(startPage + 10, totalPages);
-
-        // 시작 페이지를 조정하여 항상 페이지 목록이 10개가 되도록 함
-        if (endPage - startPage < 10) {
-            startPage = Math.max(endPage - 10, 0);
-        }
-        for (int i = startPage; i < endPage; i++) {
-            pageNumbers.add(i);
-        }
-        return pageNumbers;
+    public Page<Post> readPostList(final Pageable pageable) {
+        return postRepository.findByDeleteFalseOrderByIdDesc(pageable);
     }
 
     @Transactional
     public void increaseOrDecreasePostUpvote(final Long postId) {
         // todo: 추천 관련 erd 그리고 구현하기
         final Post post = findPost(postId);
-    }
-
-    public Boolean isPostAuthor(final Long memberId, final Long postId) {
-        final Post post = findPost(postId);
-        return post.isAuth(memberId);
     }
 }
