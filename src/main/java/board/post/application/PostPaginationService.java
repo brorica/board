@@ -4,6 +4,7 @@ import board.common.PageableRequest;
 import board.common.PageableResponse;
 import board.post.domain.Post;
 import board.post.presentation.response.PostListEntry;
+import board.upvote.application.UpvoteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,8 +19,11 @@ public class PostPaginationService {
 
     private final PostService postService;
 
-    public PostPaginationService(PostService postService) {
+    private final UpvoteService upvoteService;
+
+    public PostPaginationService(final PostService postService, final UpvoteService upvoteService) {
         this.postService = postService;
+        this.upvoteService = upvoteService;
     }
 
     public PageableResponse readPostList(final int page, final int size) {
@@ -38,7 +42,7 @@ public class PostPaginationService {
                         post.getCreator(),
                         post.getCreatedAt(),
                         post.getViewCount(),
-                        post.getUpvoteCount())
+                        upvoteService.getPostUpvoteCount(post.getId()))
                 )
                 .collect(Collectors.toList());
     }

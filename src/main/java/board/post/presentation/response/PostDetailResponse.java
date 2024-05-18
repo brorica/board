@@ -15,8 +15,6 @@ public class PostDetailResponse {
 
     private final Long viewCount;
 
-    private final Long upvoteCount;
-
     private final String content;
 
     public PostDetailResponse(final Post post) {
@@ -25,7 +23,6 @@ public class PostDetailResponse {
         this.creator = post.getCreator();
         this.createdAt = post.getCreatedAt();
         this.viewCount = post.getViewCount();
-        this.upvoteCount = post.getUpvoteCount();
         this.content = post.getContent();
     }
 
@@ -47,10 +44,6 @@ public class PostDetailResponse {
 
     public Long getViewCount() {
         return viewCount;
-    }
-
-    public Long getUpvoteCount() {
-        return upvoteCount;
     }
 
     public String getContent() {

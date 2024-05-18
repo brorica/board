@@ -71,8 +71,4 @@ public class PostController {
         return postPaginationService.readPostList(page, size);
     }
 
-    @PatchMapping("/upvote/{id}")
-    public ResponseEntity<Void> toggleUpvote(@PathVariable("id") final Long postId) {
-        return ResponseEntity.ok().build();
-    }
 }

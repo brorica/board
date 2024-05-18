@@ -70,10 +70,4 @@ public class PostService {
     public Page<Post> readPostList(final Pageable pageable) {
         return postRepository.findByDeleteFalseOrderByIdDesc(pageable);
     }
-
-    @Transactional
-    public void increaseOrDecreasePostUpvote(final Long postId) {
-        // todo: 추천 관련 erd 그리고 구현하기
-        final Post post = findPost(postId);
-    }
 }
