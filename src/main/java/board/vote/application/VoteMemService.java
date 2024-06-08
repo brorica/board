@@ -10,12 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class VoteMemService {
 
-    private ConcurrentHashMap<Long, VoteStatus> voteInfoMap;
+    private final ConcurrentHashMap<Long, VoteStatus> voteInfoMap;
+    private final ConcurrentHashMap<String, Long> votedSessionMap;
     private Long voteId1;
     private Long voteId2;
 
     public VoteMemService() {
-        this.voteInfoMap = new ConcurrentHashMap<>(32);
+        this.voteInfoMap = new ConcurrentHashMap<>(43);
+        this.votedSessionMap = new ConcurrentHashMap<>(2731);
     }
 
     public void startVote(final Vote vote1, final Vote vote2) {
@@ -25,10 +27,18 @@ public class VoteMemService {
         voteId2 = vote2.getId();
     }
 
-    public void increaseResult(final Long voteId) {
+    public void increaseResult(final Long voteId, final String sessionId) {
+        checkDuplicateVote(sessionId);
+        votedSessionMap.put(sessionId, voteId);
         VoteStatus voteStatus = voteInfoMap.get(voteId);
         voteStatus.validateVoteDate();
         voteStatus.increaseVoteCount();
+    }
+
+    private void checkDuplicateVote(final String sessionId) {
+        if(votedSessionMap.containsKey(sessionId)) {
+            throw new RuntimeException("이미 투표하셨습니다.");
+        }
     }
 
     public VoteStatusResponse getCurrentVoteStatus() {
