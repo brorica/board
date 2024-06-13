@@ -1,6 +1,7 @@
 package board.vote;
 
 import board.common.BaseTimeEntity;
+import board.vote.application.dto.VoteStatus;
 import board.vote.presentation.dto.VoteCreateParam;
 import jakarta.persistence.*;
 
@@ -27,6 +28,13 @@ public class Vote extends BaseTimeEntity {
         this.voteCount = 0L;
         this.startAt = startAt;
         this.endAt = startAt.plusDays(365);
+    }
+
+    public Vote(final VoteStatus voteStatus) {
+        this.name = voteStatus.getName();
+        this.voteCount = voteStatus.getVoteCount();
+        this.startAt = voteStatus.getStartAt();
+        this.endAt = voteStatus.getEndAt();
     }
 
     public Vote(final VoteCreateParam voteCreateParam) {

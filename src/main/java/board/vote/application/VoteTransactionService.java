@@ -2,9 +2,12 @@ package board.vote.application;
 
 import board.vote.Vote;
 import board.vote.VoteRepository;
+import board.vote.application.dto.VoteStatus;
 import board.vote.presentation.dto.VoteCreateParam;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Transactional(readOnly = true)
 @Service
@@ -19,6 +22,13 @@ public class VoteTransactionService {
     @Transactional
     public Long createVote(final VoteCreateParam voteCreateParam) {
         return voteRepository.save(new Vote(voteCreateParam)).getId();
+    }
+
+    @Transactional
+    public void createVoteByVoteStatus(final List<VoteStatus> voteStatusList) {
+        for(VoteStatus voteStatus: voteStatusList) {
+            voteRepository.save(new Vote(voteStatus));
+        }
     }
 
     public Vote findVote(final Long voteId) {

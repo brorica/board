@@ -28,6 +28,10 @@ public class VoteStatus {
         }
     }
 
+    public void increaseVoteCount() {
+        this.voteCount += 1;
+    }
+
     public String getName() {
         return name;
     }
@@ -36,7 +40,12 @@ public class VoteStatus {
         return voteCount;
     }
 
-    public void increaseVoteCount() {
-        this.voteCount += 1;
+    public LocalDateTime getStartAt() {
+        return startAt;
     }
+
+    public LocalDateTime getEndAt() {
+        return endAt;
+    }
+
 }
